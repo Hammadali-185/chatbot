@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIML Chatbot Interface</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        .chatbot {
+            flex: 1;
+            padding: 10px;
+            border-right: 1px solid #ddd;
+        }
+        .camera {
+            flex: 1;
+            padding: 10px;
+        }
+        #chatbox {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #userInput {
+            width: calc(100% - 60px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chatbot">
+            <h1>AIML Chatbot Interface</h1>
+            <div id="chatbox"></div>
+            <input type="text" id="userInput" placeholder="Enter your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div class="camera">
+            <h1>ESP32-Cam Feed</h1>
+            <img src="http://192.168.40.253/stream" alt="ESP32-Cam Stream" width="100%">
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userText = document.getElementById('userInput').value;
+            document.getElementById('userInput').value = '';
+
+            // Display the user's message
+            var userHtml = '<p><strong>User:</strong> ' + userText + '</p>';
+            document.getElementById('chatbox').innerHTML += userHtml;
+
+            // Send the message to the Flask backend
+            fetch('/get?msg=' + encodeURIComponent(userText))
+                .then(response => response.json())
+                .then(data => {
+                    var botHtml = '<p><strong>Bot:</strong> ' + data.response + '</p>';
+                    document.getElementById('chatbox').innerHTML += botHtml;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
